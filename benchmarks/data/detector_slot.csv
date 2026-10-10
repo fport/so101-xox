@@ -1,0 +1,32 @@
+frame,where,slot_by_eye,red_share
+outputs/canli/top_0.png,capture,X,0.151
+outputs/canli/top_1.png,capture,X,0.155
+outputs/canli/top_2.png,capture,X,0.153
+outputs/canli/top_3.png,capture,X,0.150
+outputs/canli/top_4.png,capture,X,0.154
+outputs/rollout_gunluk/20261010-211122/top_000.jpg,run2 first frame,X,0.131
+outputs/rollout_gunluk/20261010-211122/top_024.jpg,run2 last frame,empty,0.000
+outputs/rollout_gunluk/20261010-211639/top_000.jpg,run3 first frame,X,0.063
+outputs/rollout_gunluk/20261010-211639/top_058.jpg,run3 last frame,empty,0.000
+outputs/rollout_gunluk/20261010-212220/top_000.jpg,run4 first frame,X,0.078
+outputs/rollout_gunluk/20261010-212220/top_025.jpg,run4 last frame,empty,0.000
+outputs/strands_gunluk/20261010-212846/hamle01_middle_center/top_001.jpg,accidental first frame,empty,0.000
+outputs/strands_gunluk/20261010-212846/hamle01_middle_center/top_022.jpg,accidental last frame,empty,0.000
+outputs/strands_gunluk/20261010-213748/hamle01_top_left/top_001.jpg,move_top_left first frame,X,0.060
+outputs/strands_gunluk/20261010-213748/hamle01_top_left/top_013.jpg,move_top_left last frame,empty,0.000
+outputs/strands_gunluk/20261010-214112/hamle01_bottom_left/top_001.jpg,move_bottom_left first frame,X,0.045
+outputs/strands_gunluk/20261010-214112/hamle01_bottom_left/top_013.jpg,move_bottom_left last frame,empty,0.000
+outputs/strands_gunluk/20261010-214728/hamle01_bottom_left/top_001.jpg,empty_slot first frame,empty,0.000
+outputs/strands_gunluk/20261010-214728/hamle01_bottom_left/top_009.jpg,empty_slot last frame,empty,0.000
+outputs/strands_gunluk/20261010-214926/hamle01_middle_center/top_001.jpg,game1_move1 first frame,X,0.095
+outputs/strands_gunluk/20261010-214926/hamle01_middle_center/top_011.jpg,game1_move1 last frame,empty,0.000
+outputs/strands_gunluk/20261010-214926/hamle02_bottom_right/top_001.jpg,game1_move2 first frame,X,0.245
+outputs/strands_gunluk/20261010-214926/hamle02_bottom_right/top_009.jpg,game1_move2 last frame,empty,0.000
+outputs/strands_gunluk/20261010-214926/hamle03_middle_left/top_001.jpg,game1_move3 first frame,X,0.229
+outputs/strands_gunluk/20261010-214926/hamle03_middle_left/top_009.jpg,game1_move3 last frame,empty,0.000
+outputs/strands_gunluk/20261010-225839/hamle01_middle_center/top_001.jpg,game2_move1 first frame,X,0.067
+outputs/strands_gunluk/20261010-225839/hamle01_middle_center/top_014.jpg,game2_move1 last frame,empty,0.000
+outputs/strands_gunluk/20261010-225839/hamle02_top_right/top_001.jpg,game2_move2 first frame,X,0.082
+outputs/strands_gunluk/20261010-225839/hamle02_top_right/top_014.jpg,game2_move2 last frame,empty,0.000
+outputs/strands_gunluk/20261010-225839/hamle03_middle_left/top_001.jpg,game2_move3 first frame,X,0.298
+outputs/strands_gunluk/20261010-225839/hamle03_middle_left/top_010.jpg,game2_move3 last frame,empty,0.000

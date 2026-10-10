@@ -1,0 +1,11 @@
+[project]
+name = "so101-xox"
+version = "0.1.0"
+description = "Teaching an SO-101 arm tic-tac-toe: LeRobot + SmolVLA"
+requires-python = "==3.12.*"
+dependencies = [
+    "lerobot[feetech,core-scripts,training,smolvla]==0.6.1",
+]
+
+[tool.uv]
+package = false

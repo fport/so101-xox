@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SO-101 tic-tac-toe</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315120f'/%3E%3Cpath d='M9 9l14 14M23 9L9 23' stroke='%23f0492f' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* Colours come from the bench itself: black printed grid, red X pieces,
+   white rings, oak desk. */
+:root {
+  --bench: #15120f;
+  --panel: #1f1b17;
+  --raised: #2a2520;
+  --line: #3b342c;
+  --bar: #5d5348;
+  --ring: #f1ece2;
+  --muted: #ab9f8f;
+  --dim: #7f7567;
+  --red: #f0492f;
+  --oak: #e3a85e;
+  --green: #92cc8b;
+  --text-face: "Avenir Next", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display-face: "Avenir Next Condensed", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
+  --gap: 14px;
+  --stage-ratio: 1.912;
+  /* As tall as the window allows, but always leaving room for the side column. */
+  --stage-width: min(calc((100vh - 286px) * var(--stage-ratio)), calc(100vw - 436px));
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bench);
+  color: var(--ring);
+  font: 15px/1.4 var(--text-face);
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--oak); outline-offset: 2px; }
+svg { display: block; }
+
+.page {
+  display: grid;
+  height: 100vh;
+  min-height: 660px;
+  padding: 14px 20px 20px;
+  gap: var(--gap) 16px;
+  grid-template-columns: var(--stage-width) minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(110px, 1fr);
+  grid-template-areas: "head head" "stage side" "log side";
+}
+
+/* ------------------------------------------------------------------ header */
+.head { grid-area: head; display: flex; align-items: center; gap: 14px; min-height: 46px; }
+.mark { flex: none; }
+.title { font: 600 25px/1 var(--display-face); letter-spacing: 0.01em; margin: 0; }
+.subtitle { color: var(--muted); font-size: 13.5px; margin: 3px 0 0; }
+.head-tools { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.lang { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.lang button {
+  background: none; border: 0; padding: 7px 12px; cursor: pointer;
+  color: var(--muted); font-weight: 600; font-size: 13px;
+}
+.lang button[aria-pressed="true"] { background: var(--raised); color: var(--ring); }
+.stop {
+  background: var(--red); color: #1a0d09; border: 0; border-radius: 8px;
+  padding: 8px 22px; font-weight: 700; font-size: 14.5px; cursor: pointer;
+}
+.stop:hover:not(:disabled) { background: #ff5c41; }
+.stop:disabled { background: var(--raised); color: var(--dim); cursor: not-allowed; }
+.stop.sent { background: none; color: var(--red); box-shadow: inset 0 0 0 1.5px var(--red); }
+
+.offline {
+  display: none; background: #3a2a14; color: var(--oak); border-radius: 8px;
+  padding: 7px 14px; font-weight: 600; font-size: 14px;
+}
+.is-offline .offline { display: block; }
+
+/* ----------------------------------------------------------------- cameras */
+.stage {
+  grid-area: stage;
+  width: 100%;
+  aspect-ratio: var(--stage-ratio);
+  display: grid;
+  grid-template-columns: 2.4fr 1fr;
+  gap: var(--gap);
+  min-height: 0;
+}
+.stage-side { display: grid; grid-template-rows: 3fr 4fr; gap: var(--gap); min-height: 0; }
+.cam {
+  position: relative; overflow: hidden; min-height: 0;
+  background: #0c0a08; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line);
+}
+.cam img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; visibility: hidden;
+}
+.cam.has-picture:not(.is-broken) img { visibility: visible; }
+/* The top camera films from the side opposite the arm: turn it so the far
+   row is at the top, like the drawn board. */
+.cam.flipped img { transform: rotate(180deg); }
+.cam.board-crop img { object-fit: contain; }
+.cam-label {
+  position: absolute; left: 10px; bottom: 10px; display: flex; align-items: center; gap: 8px;
+  background: rgba(16, 13, 10, 0.78); border-radius: 6px; padding: 4px 10px;
+  font-size: 13px; font-weight: 600;
+  max-width: calc(100% - 20px); white-space: nowrap; overflow: hidden;
+}
+.cam-age { color: var(--oak); font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); flex: none; }
+.cam.is-live .live-dot { background: var(--green); }
+.cam-empty {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center;
+  align-items: center; text-align: center; padding: 20px 20px 44px; color: var(--muted);
+}
+.cam-empty strong { color: var(--ring); font-size: 16px; font-weight: 600; }
+.cam-empty span { font-size: 13px; max-width: 30ch; }
+.cam.has-picture:not(.is-broken) .cam-empty { display: none; }
+.is-offline .cam img { filter: grayscale(0.7) brightness(0.7); }
+
+/* -------------------------------------------------------------------- side */
+.side { grid-area: side; display: flex; flex-direction: column; gap: var(--gap); min-height: 0; min-width: 0; }
+
+.status { padding: 2px 2px 0; }
+.turn { display: flex; align-items: center; gap: 8px; color: var(--muted); font-weight: 600; font-size: 14px; min-height: 22px; }
+.turn svg { flex: none; }
+.phase {
+  font: 600 33px/1.08 var(--display-face); margin: 5px 0 0;
+  min-height: 2.16em; text-wrap: balance;
+}
+.status[data-tone="x"] .phase { color: var(--ring); }
+.status[data-tone="win"] .phase { color: var(--red); }
+
+.panel { background: var(--panel); border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); }
+
+.board-panel { padding: 6px 14px; display: flex; flex-direction: column; align-items: center; flex: none; }
+.board-side { color: var(--dim); font-size: 12px; line-height: 1.5; }
+#board { width: min(100%, clamp(180px, calc(100vh - 608px), 340px)); height: auto; }
+.cell-x, .cell-o, .cell-target, .cell-ghost { display: none; }
+.cell.is-x .cell-x, .cell.is-o .cell-o { display: block; }
+.cell.is-target .cell-target, .cell.is-target:not(.is-x):not(.is-o) .cell-ghost { display: block; }
+.cell.is-dim .cell-x, .cell.is-dim .cell-o { opacity: 0.3; }
+.cell-target { animation: target 1.3s ease-in-out infinite alternate; }
+@keyframes target { from { opacity: 0.45; } to { opacity: 1; } }
+
+.bubble { position: relative; padding: 11px 14px 12px; flex: none; }
+.bubble::before {
+  content: ""; position: absolute; left: 22px; top: -7px; width: 14px; height: 14px;
+  background: var(--panel); transform: rotate(45deg);
+  box-shadow: inset 1px 1px 0 var(--line);
+}
+.bubble-who { color: var(--oak); font-weight: 700; font-size: 13px; }
+.bubble-text { margin: 2px 0 0; font-size: 16.5px; line-height: 1.32; overflow-wrap: anywhere; }
+.bubble-text.is-empty { color: var(--dim); font-size: 14.5px; }
+
+.moves { flex: 1 1 0; min-height: 96px; display: flex; flex-direction: column; overflow: hidden; }
+.panel-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 9px 14px 6px; font-weight: 700; font-size: 14px;
+}
+.hits { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+.hits b { color: var(--ring); font: 600 19px/1 var(--display-face); margin-left: 6px; }
+.move-list { list-style: none; margin: 0; padding: 0 6px 6px; overflow-y: auto; }
+.move {
+  display: grid; grid-template-columns: 20px 18px minmax(0, 1fr) auto 44px; align-items: center; gap: 8px;
+  padding: 3px 8px; border-radius: 6px; font-size: 14px; line-height: 1.35;
+}
+.move:last-child { background: var(--raised); }
+.move-cell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.move-n, .move-secs { color: var(--dim); font-variant-numeric: tabular-nums; }
+.move-secs { text-align: right; }
+.pill { font-size: 12.5px; font-weight: 700; border-radius: 5px; padding: 0 7px; justify-self: end; }
+.pill.hit { color: var(--green); box-shadow: inset 0 0 0 1px rgba(146, 204, 139, 0.45); }
+.pill.miss { color: var(--oak); box-shadow: inset 0 0 0 1px rgba(227, 168, 94, 0.5); }
+.pill.pending { color: var(--muted); }
+.empty-note { color: var(--dim); padding: 2px 14px 10px; font-size: 14px; }
+
+/* --------------------------------------------------------------------- log */
+.log { grid-area: log; display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; }
+.log-list {
+  list-style: none; margin: 0; padding: 4px 6px 8px; overflow-y: auto; flex: 1;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14px);
+  mask-image: linear-gradient(to bottom, transparent, #000 14px);
+}
+.event { display: grid; grid-template-columns: 66px 64px minmax(0, 1fr); gap: 10px; padding: 1.5px 8px; font-size: 13.5px; }
+.event-time { color: var(--dim); font-variant-numeric: tabular-nums; }
+.event-kind { color: var(--muted); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.event[data-kind="claude"] .event-kind { color: var(--oak); }
+.event[data-kind="robot"] .event-kind { color: var(--red); }
+.event[data-kind="human"] .event-kind, .event[data-kind="vision"] .event-kind { color: var(--ring); }
+.event[data-kind="error"] .event-kind, .event[data-kind="stop"] .event-kind { color: var(--red); }
+.event[data-kind="error"] .event-text { color: var(--red); }
+.event-text { overflow-wrap: anywhere; }
+
+/* Narrow windows: one column, the page scrolls. */
+@media (max-width: 1080px) {
+  .page {
+    height: auto; min-height: 100vh; grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none; grid-template-areas: "head" "stage" "side" "log";
+  }
+  .subtitle { display: none; }
+  #board { width: min(100%, 292px); }
+  .log { max-height: 320px; }
+  .moves { flex: none; max-height: 300px; }
+}
+@media (max-width: 640px) {
+  .page { padding: 12px; }
+  .stage { grid-template-columns: 1fr; aspect-ratio: auto; }
+  .stage-side { grid-template-rows: none; grid-template-columns: 1fr 1fr; }
+  .cam { aspect-ratio: 4 / 3; }
+  .cam.board-crop { aspect-ratio: 1; }
+  .head { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cell-target { animation: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="glyph-x" viewBox="0 0 20 20"><path d="M4.5 4.5l11 11M15.5 4.5l-11 11" fill="none" stroke="#f0492f" stroke-width="4" stroke-linecap="round"/></symbol>
+  <symbol id="glyph-o" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.6" fill="none" stroke="#f1ece2" stroke-width="3.4"/></symbol>
+</svg>
+
+<div class="page">
+  <header class="head">
+    <svg class="mark" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M5 8l11 11M16 8L5 19" fill="none" stroke="#f0492f" stroke-width="4.6" stroke-linecap="round"/>
+      <circle cx="28" cy="27" r="7.4" fill="none" stroke="#f1ece2" stroke-width="3.6"/>
+    </svg>
+    <div>
+      <h1 class="title" data-i18n="title"></h1>
+      <p class="subtitle" data-i18n="subtitle"></p>
+    </div>
+    <div class="head-tools">
+      <div class="offline" role="status" data-i18n="offline"></div>
+      <div class="lang" role="group" data-i18n-label="language">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="tr" aria-pressed="false">TR</button>
+      </div>
+      <button type="button" class="stop" id="stop" disabled></button>
+    </div>
+  </header>
+
+  <section class="stage">
+    <div class="cam flipped" data-cam="top">
+      <img alt="" data-i18n-alt="cam_top">
+      <div class="cam-empty"><strong data-i18n="no_picture"></strong><span data-i18n="no_picture_hint"></span></div>
+      <div class="cam-label"><i class="live-dot"></i><span data-i18n="cam_top"></span><span class="cam-age"></span></div>
+    </div>
+    <div class="stage-side">
+      <div class="cam" data-cam="wrist">
+        <img alt="" data-i18n-alt="cam_wrist">
+        <div class="cam-empty"><strong data-i18n="no_picture"></strong><span data-i18n="no_picture_hint"></span></div>
+        <div class="cam-label"><i class="live-dot"></i><span data-i18n="cam_wrist"></span><span class="cam-age"></span></div>
+      </div>
+      <div class="cam board-crop" data-cam="board">
+        <img alt="" data-i18n-alt="cam_board">
+        <div class="cam-empty"><strong data-i18n="no_board"></strong><span data-i18n="no_board_hint"></span></div>
+        <div class="cam-label"><span data-i18n="cam_board"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <div class="status" id="status" aria-live="polite">
+      <div class="turn" id="turn"></div>
+      <p class="phase" id="phase"></p>
+    </div>
+
+    <div class="panel board-panel">
+      <span class="board-side" data-i18n="far_side"></span>
+      <svg id="board" viewBox="0 0 300 300" role="img"></svg>
+      <span class="board-side" data-i18n="arm_side"></span>
+    </div>
+
+    <div class="panel bubble">
+      <div class="bubble-who">Claude</div>
+      <p class="bubble-text" id="message"></p>
+    </div>
+
+    <div class="panel moves">
+      <div class="panel-head"><span data-i18n="moves"></span><span class="hits" id="hits"></span></div>
+      <ol class="move-list" id="moves"></ol>
+    </div>
+  </aside>
+
+  <section class="panel log">
+    <div class="panel-head"><span data-i18n="log"></span></div>
+    <ol class="log-list" id="log"></ol>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var TEXT = {
+    en: {
+      title: "SO-101 plays tic-tac-toe",
+      subtitle: "Claude picks the cell, a SmolVLA policy moves the arm",
+      language: "Language",
+      offline: "Lost the connection to the game. Trying again every second.",
+      cam_top: "Top camera", cam_wrist: "Wrist camera", cam_board: "What Claude sees",
+      no_picture: "No picture yet",
+      no_picture_hint: "It shows up here once the game sends a frame.",
+      no_board: "No board picture yet",
+      no_board_hint: "The cropped board appears after the first board read.",
+      age: "last frame {n} s ago",
+      turn_x: "Robot's turn, playing X", turn_o: "Human's turn, playing O",
+      far_side: "far side", arm_side: "arm side",
+      no_message: "Claude has not said anything yet.",
+      moves: "Moves", hits: "Hits", no_moves: "No moves yet.",
+      hit: "hit", miss: "miss", pending: "pending",
+      log: "Log", no_events: "Nothing logged yet.",
+      stop: "Stop", stop_sent: "Stop requested", stop_unavailable: "No stop handler is connected to the game",
+      board_label: "Board",
+      phase_idle: "Game has not started",
+      phase_thinking: "Claude is choosing a cell",
+      phase_waiting_for_x_in_slot: "Waiting for an X piece in the pick slot",
+      phase_arm_moving: "Arm is moving", phase_arm_moving_to: "Arm is moving to {cell}",
+      phase_verifying: "Checking where the piece landed",
+      phase_waiting_for_o: "Waiting for the human to place an O",
+      phase_reading_board: "Reading the board",
+      phase_game_over: "Game over", win_x: "Robot wins", win_o: "Human wins", win_draw: "Draw",
+      phase_stopped: "Stopped",
+      cells: ["top left", "top center", "top right", "middle left", "center", "middle right",
+              "bottom left", "bottom center", "bottom right"]
+    },
+    tr: {
+      title: "SO-101 XOX oynuyor",
+      subtitle: "Hücreyi Claude seçiyor, kolu bir SmolVLA politikası oynatıyor",
+      language: "Dil",
+      offline: "Oyunla bağlantı koptu. Her saniye yeniden deneniyor.",
+      cam_top: "Üst kamera", cam_wrist: "Bilek kamerası", cam_board: "Claude'un gördüğü",
+      no_picture: "Henüz görüntü yok",
+      no_picture_hint: "Oyun bir kare gönderdiğinde burada görünür.",
+      no_board: "Henüz tahta görüntüsü yok",
+      no_board_hint: "Kırpılmış tahta, ilk tahta okumasından sonra görünür.",
+      age: "son kare {n} sn önce",
+      turn_x: "Sıra robotta, X oynuyor", turn_o: "Sıra insanda, O oynuyor",
+      far_side: "uzak taraf", arm_side: "kol tarafı",
+      no_message: "Claude henüz bir şey söylemedi.",
+      moves: "Hamleler", hits: "İsabet", no_moves: "Henüz hamle yok.",
+      hit: "isabet", miss: "ıska", pending: "bekliyor",
+      log: "Günlük", no_events: "Günlükte henüz kayıt yok.",
+      stop: "Durdur", stop_sent: "Durdurma istendi", stop_unavailable: "Oyuna bağlı bir durdurma işlevi yok",
+      board_label: "Tahta",
+      phase_idle: "Oyun başlamadı",
+      phase_thinking: "Claude hücre seçiyor",
+      phase_waiting_for_x_in_slot: "Alma yuvasına bir X taşı bekleniyor",
+      phase_arm_moving: "Kol hareket ediyor", phase_arm_moving_to: "Kol {cell} hücresine gidiyor",
+      phase_verifying: "Taşın nereye düştüğüne bakılıyor",
+      phase_waiting_for_o: "İnsanın O koyması bekleniyor",
+      phase_reading_board: "Tahta okunuyor",
+      phase_game_over: "Oyun bitti", win_x: "Robot kazandı", win_o: "İnsan kazandı", win_draw: "Berabere",
+      phase_stopped: "Durduruldu",
+      cells: ["üst sol", "üst orta", "üst sağ", "orta sol", "orta", "orta sağ",
+              "alt sol", "alt orta", "alt sağ"]
+    }
+  };
+  var CELLS = ["top_left", "top_center", "top_right", "middle_left", "middle_center", "middle_right",
+               "bottom_left", "bottom_center", "bottom_right"];
+  var WIN_LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+  var SVG_NS = "http://www.w3.org/2000/svg";
+  var POLL_MS = 400, RETRY_MS = 1000, STALE_SECONDS = 3;
+
+  var params = new URLSearchParams(location.search);
+  var useStreams = params.get("stream") !== "0";   // ?stream=0 polls JPEGs instead
+  var lang = "en";
+  try {
+    var saved = localStorage.getItem("xox.lang");
+    if (saved === "en" || saved === "tr") lang = saved;
+  } catch (e) { /* storage blocked: stay on the default */ }
+  if (params.get("lang") === "tr" || params.get("lang") === "en") lang = params.get("lang");
+
+  var snap = null, online = true, renderedVersion = -1, renderedLang = null, lastEventId = 0;
+
+  function $(id) { return document.getElementById(id); }
+  function t(key, vars) {
+    var s = TEXT[lang][key];
+    if (s === undefined) s = TEXT.en[key];
+    if (s === undefined) return key;
+    if (vars) Object.keys(vars).forEach(function (k) { s = s.replace("{" + k + "}", vars[k]); });
+    return s;
+  }
+  function cellLabel(name) {
+    var i = CELLS.indexOf(name);
+    return i < 0 ? String(name || "").replace(/_/g, " ") : TEXT[lang].cells[i];
+  }
+  function svg(tag, attrs, parent) {
+    var el = document.createElementNS(SVG_NS, tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(el);
+    return el;
+  }
+  function glyph(mark, size) {
+    var el = svg("svg", { width: size, height: size, "aria-hidden": "true" });
+    svg("use", { href: mark === "O" ? "#glyph-o" : "#glyph-x" }, el);
+    return el;
+  }
+
+  // ------------------------------------------------------------ static text
+  function applyLanguage() {
+    document.documentElement.lang = lang;
+    document.title = t("title");
+    document.querySelectorAll("[data-i18n]").forEach(function (el) { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll("[data-i18n-alt]").forEach(function (el) { el.alt = t(el.dataset.i18nAlt); });
+    document.querySelectorAll("[data-i18n-label]").forEach(function (el) {
+      el.setAttribute("aria-label", t(el.dataset.i18nLabel));
+    });
+    document.querySelectorAll(".lang button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+    });
+  }
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      lang = b.dataset.lang;
+      try { localStorage.setItem("xox.lang", lang); } catch (e) { /* not remembered */ }
+      applyLanguage();
+      render(true);
+    });
+  });
+
+  // ------------------------------------------------------------ drawn board
+  var boardSvg = $("board"), cellEls = [], winLine;
+  (function buildBoard() {
+    for (var i = 0; i < 9; i++) {
+      var x = (i % 3) * 100, y = Math.floor(i / 3) * 100, cx = x + 50, cy = y + 50;
+      var g = svg("g", { "class": "cell" }, boardSvg);
+      svg("rect", { "class": "cell-target", x: x + 9, y: y + 9, width: 82, height: 82, rx: 10,
+                    fill: "rgba(227,168,94,0.16)", stroke: "#e3a85e", "stroke-width": 2.5 }, g);
+      svg("path", { "class": "cell-ghost", d: xPath(cx, cy, 24), fill: "none", stroke: "#f0492f",
+                    "stroke-width": 11, "stroke-linecap": "round", opacity: 0.28 }, g);
+      svg("path", { "class": "cell-x", d: xPath(cx, cy, 24), fill: "none", stroke: "#f0492f",
+                    "stroke-width": 13, "stroke-linecap": "round" }, g);
+      svg("circle", { "class": "cell-o", cx: cx, cy: cy, r: 26, fill: "none", stroke: "#f1ece2",
+                      "stroke-width": 10 }, g);
+      cellEls.push(g);
+    }
+    // Four bars with round ends, like the printed grid on the desk.
+    [100, 200].forEach(function (p) {
+      svg("rect", { x: p - 4.5, y: 6, width: 9, height: 288, rx: 4.5, fill: "#5d5348" }, boardSvg);
+      svg("rect", { x: 6, y: p - 4.5, width: 288, height: 9, rx: 4.5, fill: "#5d5348" }, boardSvg);
+    });
+    winLine = svg("line", { stroke: "#f1ece2", "stroke-width": 4, "stroke-linecap": "round",
+                            opacity: 0.9, visibility: "hidden" }, boardSvg);
+  })();
+  function xPath(cx, cy, r) {
+    return "M" + (cx - r) + " " + (cy - r) + "L" + (cx + r) + " " + (cy + r) +
+           "M" + (cx + r) + " " + (cy - r) + "L" + (cx - r) + " " + (cy + r);
+  }
+  function winningLine(board) {
+    for (var i = 0; i < WIN_LINES.length; i++) {
+      var l = WIN_LINES[i];
+      if (board[l[0]] !== " " && board[l[0]] === board[l[1]] && board[l[1]] === board[l[2]]) return l;
+    }
+    return null;
+  }
+  function renderBoard(s) {
+    var line = winningLine(s.board), words = [];
+    cellEls.forEach(function (g, i) {
+      var mark = s.board[i];
+      g.classList.toggle("is-x", mark === "X");
+      g.classList.toggle("is-o", mark === "O");
+      g.classList.toggle("is-target", s.target_index === i);
+      g.classList.toggle("is-dim", !!line && line.indexOf(i) < 0);
+      if (mark !== " ") words.push(mark + " " + TEXT[lang].cells[i]);
+    });
+    if (line) {
+      var a = line[0], b = line[2];
+      var ax = (a % 3) * 100 + 50, ay = Math.floor(a / 3) * 100 + 50;
+      var bx = (b % 3) * 100 + 50, by = Math.floor(b / 3) * 100 + 50;
+      var dx = (bx - ax) * 0.16, dy = (by - ay) * 0.16;
+      winLine.setAttribute("x1", ax - dx); winLine.setAttribute("y1", ay - dy);
+      winLine.setAttribute("x2", bx + dx); winLine.setAttribute("y2", by + dy);
+    }
+    winLine.setAttribute("visibility", line ? "visible" : "hidden");
+    boardSvg.setAttribute("aria-label", t("board_label") + ": " + (words.join(", ") || "-"));
+  }
+
+  // ----------------------------------------------------------------- status
+  function phaseText(s) {
+    if (s.phase === "game_over") {
+      if (s.winner === "X") return t("win_x");
+      if (s.winner === "O") return t("win_o");
+      if (s.winner === "draw") return t("win_draw");
+    }
+    if (s.phase === "arm_moving" && s.target_cell) {
+      return t("phase_arm_moving_to", { cell: cellLabel(s.target_cell) });
+    }
+    var key = "phase_" + s.phase;
+    return TEXT.en[key] === undefined ? String(s.phase).replace(/_/g, " ") : t(key);
+  }
+  function renderStatus(s) {
+    var turn = $("turn");
+    turn.textContent = "";
+    if (s.turn === "x" || s.turn === "o") {
+      turn.appendChild(glyph(s.turn === "o" ? "O" : "X", 18));
+      turn.appendChild(document.createTextNode(t("turn_" + s.turn)));
+    }
+    $("phase").textContent = phaseText(s);
+    $("status").dataset.tone = s.phase === "game_over" && s.winner === "X" ? "win" : "x";
+  }
+  function renderMessage(s) {
+    var el = $("message");
+    el.textContent = s.message || t("no_message");
+    el.classList.toggle("is-empty", !s.message);
+  }
+  function renderMoves(s) {
+    var list = $("moves"), hits = 0, judged = 0;
+    list.textContent = "";
+    s.moves.forEach(function (m, i) {
+      var li = document.createElement("li");
+      li.className = "move";
+      var n = document.createElement("span"); n.className = "move-n"; n.textContent = i + 1;
+      var cell = document.createElement("span"); cell.className = "move-cell"; cell.textContent = cellLabel(m.cell);
+      var pill = document.createElement("span");
+      if (m.player !== "O") {
+        var kind = m.hit === true ? "hit" : m.hit === false ? "miss" : "pending";
+        pill.className = "pill " + kind;
+        pill.textContent = t(kind);
+        if (m.hit !== null && m.hit !== undefined) { judged++; if (m.hit) hits++; }
+      }
+      var secs = document.createElement("span"); secs.className = "move-secs";
+      secs.textContent = typeof m.seconds === "number" ? Math.round(m.seconds) + " s" : "";
+      li.appendChild(n); li.appendChild(glyph(m.player, 16)); li.appendChild(cell);
+      li.appendChild(pill); li.appendChild(secs);
+      list.appendChild(li);
+    });
+    if (!s.moves.length) {
+      var note = document.createElement("li"); note.className = "empty-note"; note.textContent = t("no_moves");
+      list.appendChild(note);
+    }
+    list.scrollTop = list.scrollHeight;
+    var h = $("hits");
+    h.textContent = t("hits");
+    var b = document.createElement("b"); b.textContent = hits + " / " + judged;
+    h.appendChild(b);
+  }
+  function renderLog(s, rebuild) {
+    var list = $("log");
+    var pinned = list.scrollHeight - list.scrollTop - list.clientHeight < 30;
+    if (rebuild) { list.textContent = ""; lastEventId = 0; }
+    var note = list.querySelector(".empty-note");
+    if (note && s.events.length) note.remove();
+    s.events.forEach(function (ev) {
+      if (ev.id <= lastEventId) return;
+      lastEventId = ev.id;
+      var li = document.createElement("li"); li.className = "event"; li.dataset.kind = ev.kind;
+      var time = document.createElement("span"); time.className = "event-time";
+      time.textContent = new Date(ev.t * 1000).toLocaleTimeString("en-GB");
+      var kind = document.createElement("span"); kind.className = "event-kind"; kind.textContent = ev.kind;
+      var text = document.createElement("span"); text.className = "event-text"; text.textContent = ev.text;
+      li.appendChild(time); li.appendChild(kind); li.appendChild(text);
+      list.appendChild(li);
+    });
+    while (list.children.length > 300) list.removeChild(list.firstChild);
+    if (!list.children.length) {
+      var empty = document.createElement("li"); empty.className = "empty-note"; empty.textContent = t("no_events");
+      list.appendChild(empty);
+    }
+    if (pinned) list.scrollTop = list.scrollHeight;
+  }
+  function renderStop(s) {
+    var b = $("stop");
+    var sent = !!(s && s.stop_requested);
+    b.textContent = sent ? t("stop_sent") : t("stop");
+    b.classList.toggle("sent", sent);
+    b.disabled = !online || !s || !s.can_stop || sent;
+    b.title = s && !s.can_stop ? t("stop_unavailable") : "";
+  }
+  $("stop").addEventListener("click", function () {
+    $("stop").disabled = true;
+    fetch("/stop", { method: "POST" }).catch(function () { /* the poll reports the outage */ });
+  });
+
+  function render(force) {
+    var s = snap;
+    renderStop(s);
+    if (!s) {
+      $("phase").textContent = online ? t("phase_idle") : "";
+      renderMessage({ message: "" });
+      return;
+    }
+    if (!force && s.version === renderedVersion && lang === renderedLang) return;
+    var languageChanged = lang !== renderedLang;
+    renderedVersion = s.version; renderedLang = lang;
+    renderStatus(s); renderBoard(s); renderMessage(s); renderMoves(s);
+    renderLog(s, false);
+    if (languageChanged) updateCameras(s);
+  }
+
+  // ---------------------------------------------------------------- cameras
+  function Camera(el) {
+    var self = this;
+    this.el = el; this.name = el.dataset.cam; this.img = el.querySelector("img");
+    this.age = el.querySelector(".cam-age");
+    this.mode = "off";          // off | stream | poll | still
+    this.seq = 0; this.timer = null;
+    this.img.addEventListener("load", function () {
+      el.classList.remove("is-broken");
+      if (self.mode === "poll") self.next(120);
+    });
+    this.img.addEventListener("error", function () {
+      el.classList.add("is-broken");                                     // hide the broken-image icon
+      if (self.mode === "stream") { self.mode = "poll"; self.next(0); }   // stream failed: poll JPEGs
+      else if (self.mode === "poll") self.next(700);
+    });
+  }
+  Camera.prototype.next = function (delay) {
+    var self = this;
+    clearTimeout(this.timer);
+    this.timer = setTimeout(function () {
+      if (self.mode === "poll") self.img.src = "/frame/" + self.name + ".jpg?t=" + Date.now();
+    }, delay);
+  };
+  Camera.prototype.update = function (info) {
+    if (!info) return;
+    this.el.classList.add("has-picture");
+    if (this.name === "board") {           // changes once a turn: reload on demand
+      if (info.seq !== this.seq) { this.seq = info.seq; this.mode = "still"; this.img.src = "/frame/board.jpg?s=" + info.seq; }
+      return;
+    }
+    if (this.mode === "off") {
+      if (useStreams) { this.mode = "stream"; this.img.src = "/stream/" + this.name + "?c=" + Date.now(); }
+      else { this.mode = "poll"; this.next(0); }
+    }
+    var stale = info.age > STALE_SECONDS;
+    this.el.classList.toggle("is-live", !stale && online);
+    this.age.textContent = stale ? t("age", { n: Math.round(info.age) }) : "";
+  };
+  Camera.prototype.restart = function () { clearTimeout(this.timer); this.mode = "off"; this.seq = 0; };
+
+  var cameras = Array.prototype.map.call(document.querySelectorAll("[data-cam]"), function (el) { return new Camera(el); });
+  function updateCameras(s) {
+    cameras.forEach(function (c) { c.update(s.frames ? s.frames[c.name] : null); });
+  }
+
+  // ---------------------------------------------------------------- polling
+  function setOnline(value) {
+    if (online === value) return;
+    online = value;
+    document.body.classList.toggle("is-offline", !online);
+    if (online) cameras.forEach(function (c) { c.restart(); });   // reopen the streams
+    else cameras.forEach(function (c) { c.el.classList.remove("is-live"); });
+    renderStop(snap);
+  }
+  function poll() {
+    var ctl = new AbortController();
+    var guard = setTimeout(function () { ctl.abort(); }, 2500);
+    fetch("/state", { cache: "no-store", signal: ctl.signal })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (s) {
+        clearTimeout(guard);
+        if (snap && s.version < snap.version) { renderedVersion = -1; lastEventId = 0; $("log").textContent = ""; }
+        snap = s;
+        setOnline(true);
+        render(false);
+        updateCameras(s);
+        setTimeout(poll, POLL_MS);
+      })
+      .catch(function () {
+        clearTimeout(guard);
+        setOnline(false);
+        setTimeout(poll, RETRY_MS);
+      });
+  }
+
+  applyLanguage();
+  render(true);
+  renderLog({ events: [] }, true);
+  poll();
+})();
+</script>
+</body>
+</html>

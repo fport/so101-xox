@@ -1,0 +1,10 @@
+cell,completed_moves,landed,landed_seen_in_frame,landed_per_notes_only,by_kind
+top left,1,1,1,0,move x1
+top center,0,0,0,0,
+top right,1,1,1,0,game 2 x1
+middle left,2,2,0,2,game 1 x1 + game 2 x1
+middle center,4,4,4,0,direct x2 + game 1 x1 + game 2 x1
+middle right,0,0,0,0,
+bottom left,1,1,1,0,move x1
+bottom center,0,0,0,0,
+bottom right,1,1,1,0,game 1 x1

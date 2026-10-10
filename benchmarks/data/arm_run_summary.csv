@@ -1,0 +1,4 @@
+run,label,inference,source,log_lines,policy_steps,return_lines,policy_duration_s,jumps_over_6deg,jumps_over_6deg_on_chunk_boundary,max_jump_deg,max_jump_step,max_jump_joint,median_step_deg,mean_step_deg,chunk_boundaries,pauses_over_0p2s,pauses_on_chunk_boundary,mean_pause_s,jumps_over_6_with_gripper,jumps_over_6_with_gripper_on_chunk_boundary
+run2,run 2,queued,outputs/rollout_gunluk/20261010-211122/adimlar.jsonl,730,580,150,19.318,7,7,29.486,250,shoulder_lift,0.845,1.229,11,0,0,,8,8
+run3,run 3,queued,outputs/rollout_gunluk/20261010-211639/adimlar.jsonl,1749,1599,150,53.314,11,10,28.728,50,shoulder_lift,0.543,0.820,31,0,0,,16,15
+run4,run 4,sync,outputs/rollout_gunluk/20261010-212220/adimlar.jsonl,753,747,6,29.670,0,0,4.584,31,wrist_flex,0.618,0.845,14,14,14,0.396,0,0

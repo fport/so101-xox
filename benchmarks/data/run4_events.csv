@@ -1,0 +1,7 @@
+event,t_s,definition
+gripper_opens_at_slot,4.798,measured gripper opening rises above 8 % for the first time
+pick,6.928,measured gripper opening falls back below 8 %: the gripper closes on the X
+release,15.660,measured gripper opening rises above 8 % for the last time: the gripper lets go
+gripper_closed_again,16.868,measured gripper opening falls below 8 % for the last time
+start,1.254,commanded pose leaves the rest pose by more than 10° (see moves.csv)
+back,19.280,commanded pose back within 8° of rest (see moves.csv)

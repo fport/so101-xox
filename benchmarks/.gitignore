@@ -1,0 +1,3 @@
+# The repo-wide rule `data/` (the Hugging Face datasets) would hide this folder too.
+# These small derived tables are meant to be committed.
+!data/

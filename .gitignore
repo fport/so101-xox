@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.DS_Store
+
+# large files live on the Hugging Face Hub
+data/
+outputs/
+policies/
+wandb/
+
+.venv-strands/
+
+# keys
+.env
+
+# unpublished drafts (social posts)
+drafts/

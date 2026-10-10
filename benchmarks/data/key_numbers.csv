@@ -1,0 +1,207 @@
+key,value,unit,what
+run2_policy_steps,580,steps,run 2: control steps sent by the policy
+run2_return_lines,150,lines,"run 2: trailing log lines of the scripted return, excluded"
+run2_policy_duration,19.3,s,run 2: first to last policy command
+run2_jumps_over_6,7,steps,run 2: steps whose command change exceeds 6° (five arm joints)
+run2_jumps_on_boundary,7,steps,"run 2: of those, on a chunk boundary (step divisible by 50)"
+run2_max_jump,29.5,deg,run 2: largest per-step command change
+run2_median_step,0.8,deg,run 2: median per-step command change
+run2_chunk_boundaries,11,boundaries,run 2: chunk boundaries in the policy part
+run2_pauses,0,pauses,run 2: gaps between commands longer than 0.2 s
+run2_jumps_over_6_with_gripper,8,steps,run 2: the same count with the gripper channel (0-100) included
+run2_jumps_on_boundary_with_gripper,8,steps,"run 2: of those, on a chunk boundary"
+run2_step50_wrist_flex_before,53.0,deg,run 2: commanded wrist_flex at step 49
+run2_step50_wrist_flex_after,78.0,deg,run 2: commanded wrist_flex at step 50
+run3_policy_steps,1599,steps,run 3: control steps sent by the policy
+run3_return_lines,150,lines,"run 3: trailing log lines of the scripted return, excluded"
+run3_policy_duration,53.3,s,run 3: first to last policy command
+run3_jumps_over_6,11,steps,run 3: steps whose command change exceeds 6° (five arm joints)
+run3_jumps_on_boundary,10,steps,"run 3: of those, on a chunk boundary (step divisible by 50)"
+run3_max_jump,28.7,deg,run 3: largest per-step command change
+run3_median_step,0.5,deg,run 3: median per-step command change
+run3_chunk_boundaries,31,boundaries,run 3: chunk boundaries in the policy part
+run3_pauses,0,pauses,run 3: gaps between commands longer than 0.2 s
+run3_jumps_over_6_with_gripper,16,steps,run 3: the same count with the gripper channel (0-100) included
+run3_jumps_on_boundary_with_gripper,15,steps,"run 3: of those, on a chunk boundary"
+run4_policy_steps,747,steps,run 4: control steps sent by the policy
+run4_return_lines,6,lines,"run 4: trailing log lines of the scripted return, excluded"
+run4_policy_duration,29.7,s,run 4: first to last policy command
+run4_jumps_over_6,0,steps,run 4: steps whose command change exceeds 6° (five arm joints)
+run4_jumps_on_boundary,0,steps,"run 4: of those, on a chunk boundary (step divisible by 50)"
+run4_max_jump,4.6,deg,run 4: largest per-step command change
+run4_median_step,0.6,deg,run 4: median per-step command change
+run4_chunk_boundaries,14,boundaries,run 4: chunk boundaries in the policy part
+run4_pauses,14,pauses,run 4: gaps between commands longer than 0.2 s
+run4_mean_pause,0.4,s,run 4: mean length of those gaps
+run4_jumps_over_6_with_gripper,0,steps,run 4: the same count with the gripper channel (0-100) included
+run4_jumps_on_boundary_with_gripper,0,steps,"run 4: of those, on a chunk boundary"
+run4_pick,6.9,s,run 4: the gripper closes on the X (measured opening back below 8 %)
+run4_release,15.7,s,run 4: the gripper opens over the cell (measured opening above 8 %)
+run4_gripper_closed_again,16.9,s,run 4: the gripper is closed again after the release
+run4_gripper_holding,4.7,%,run 4: median measured gripper opening while it holds the X
+run4_gripper_empty,1.0,%,run 4: median measured gripper opening after the release
+run4_wrist_flex_rest_offset,3.8,deg,"run 4, arm back at rest: median of commanded minus measured wrist_flex"
+queued_jumps_over_6,18,steps,runs 2 and 3 together: steps with a command change above 6°
+queued_jumps_on_boundary,17,steps,"runs 2 and 3 together: of those, on a chunk boundary"
+queued_max_jump,29.5,deg,runs 2 and 3: largest per-step command change
+queued_boundaries,42,boundaries,runs 2 and 3 together: chunk boundaries
+queued_boundaries_over_6,17,boundaries,runs 2 and 3 together: chunk boundaries with a jump above 6°
+moves_logged,13,logs,logged runs of the policy on the arm (run 1 was not logged)
+moves_completed,10,moves,moves the project notes count as completed
+moves_landed,10,moves,"of those, X in the right cell"
+moves_landed_seen_in_frame,8,moves,landing visible in a later top frame on disk
+moves_landed_notes_only,2,moves,landing known from the project notes only
+cells_tried,6,cells,cells with at least one completed move
+moves_return_logged,8,moves,completed moves whose return to rest is in the log
+sync_moves_timed,7,moves,sync moves with start and return in the log
+sync_start_min,0.2,s,sync moves: shortest wait before the arm starts
+sync_start_max,3.2,s,sync moves: longest wait before the arm starts
+sync_start_median,1.4,s,sync moves: median wait before the arm starts
+sync_back_min,14.5,s,sync moves: shortest time until the arm is back
+sync_back_max,25.9,s,sync moves: longest time until the arm is back
+sync_back_median,21.5,s,sync moves: median time until the arm is back
+sync_moves_started,9,moves,completed sync moves (start time available for all)
+sync_start_all_min,0.2,s,all completed sync moves: shortest wait before the start
+sync_start_all_max,3.2,s,all completed sync moves: longest wait before the start
+sync_start_all_median,1.6,s,all completed sync moves: median wait before the start
+run2_first_leave,1.4,s,run2: first command more than 10° from the rest pose
+run2_start,6.8,s,run2: the arm starts (start of the departure that leads to the farthest point)
+run2_start_far20,7.5,s,run2: first command with shoulder_lift or elbow_flex more than 20° from rest
+run2_end,19.3,s,run2: last policy command in the log
+run3_first_leave,0.7,s,run3: first command more than 10° from the rest pose
+run3_start,0.7,s,run3: the arm starts (start of the departure that leads to the farthest point)
+run3_start_far20,1.6,s,run3: first command with shoulder_lift or elbow_flex more than 20° from rest
+run3_back,29.7,s,run3: the arm is back (first of 45 consecutive commands within 8° of rest)
+run3_end,53.3,s,run3: last policy command in the log
+run4_first_leave,1.3,s,run4: first command more than 10° from the rest pose
+run4_start,1.3,s,run4: the arm starts (start of the departure that leads to the farthest point)
+run4_start_far20,2.5,s,run4: first command with shoulder_lift or elbow_flex more than 20° from rest
+run4_back,19.3,s,run4: the arm is back (first of 45 consecutive commands within 8° of rest)
+run4_end,29.7,s,run4: last policy command in the log
+accidental_end,44.8,s,accidental: last policy command in the log
+accidental_max_jump,1.4,deg,accidental: largest per-step command change
+move_top_left_first_leave,1.7,s,move_top_left: first command more than 10° from the rest pose
+move_top_left_start,1.7,s,move_top_left: the arm starts (start of the departure that leads to the farthest point)
+move_top_left_start_far20,3.1,s,move_top_left: first command with shoulder_lift or elbow_flex more than 20° from rest
+move_top_left_back,21.5,s,move_top_left: the arm is back (first of 45 consecutive commands within 8° of rest)
+move_top_left_end,23.4,s,move_top_left: last policy command in the log
+move_top_left_max_jump,5.5,deg,move_top_left: largest per-step command change
+move_bottom_left_first_leave,1.4,s,move_bottom_left: first command more than 10° from the rest pose
+move_bottom_left_start,1.4,s,move_bottom_left: the arm starts (start of the departure that leads to the farthest point)
+move_bottom_left_start_far20,3.1,s,move_bottom_left: first command with shoulder_lift or elbow_flex more than 20° from rest
+move_bottom_left_back,22.0,s,move_bottom_left: the arm is back (first of 45 consecutive commands within 8° of rest)
+move_bottom_left_end,24.0,s,move_bottom_left: last policy command in the log
+move_bottom_left_max_jump,5.7,deg,move_bottom_left: largest per-step command change
+empty_slot_end,16.0,s,empty_slot: last policy command in the log
+empty_slot_max_jump,2.1,deg,empty_slot: largest per-step command change
+game1_move1_first_leave,1.2,s,game1_move1: first command more than 10° from the rest pose
+game1_move1_start,1.2,s,game1_move1: the arm starts (start of the departure that leads to the farthest point)
+game1_move1_start_far20,2.7,s,game1_move1: first command with shoulder_lift or elbow_flex more than 20° from rest
+game1_move1_back,19.3,s,game1_move1: the arm is back (first of 45 consecutive commands within 8° of rest)
+game1_move1_end,20.8,s,game1_move1: last policy command in the log
+game1_move1_max_jump,5.4,deg,game1_move1: largest per-step command change
+game1_move2_first_leave,3.2,s,game1_move2: first command more than 10° from the rest pose
+game1_move2_start,3.2,s,game1_move2: the arm starts (start of the departure that leads to the farthest point)
+game1_move2_start_far20,4.6,s,game1_move2: first command with shoulder_lift or elbow_flex more than 20° from rest
+game1_move2_back,14.5,s,game1_move2: the arm is back (first of 45 consecutive commands within 8° of rest)
+game1_move2_end,16.5,s,game1_move2: last policy command in the log
+game1_move2_max_jump,3.9,deg,game1_move2: largest per-step command change
+game1_move3_first_leave,1.6,s,game1_move3: first command more than 10° from the rest pose
+game1_move3_start,1.6,s,game1_move3: the arm starts (start of the departure that leads to the farthest point)
+game1_move3_start_far20,2.7,s,game1_move3: first command with shoulder_lift or elbow_flex more than 20° from rest
+game1_move3_end,16.7,s,game1_move3: last policy command in the log
+game1_move3_max_jump,3.6,deg,game1_move3: largest per-step command change
+game2_move1_first_leave,0.2,s,game2_move1: first command more than 10° from the rest pose
+game2_move1_start,0.2,s,game2_move1: the arm starts (start of the departure that leads to the farthest point)
+game2_move1_start_far20,1.2,s,game2_move1: first command with shoulder_lift or elbow_flex more than 20° from rest
+game2_move1_back,25.9,s,game2_move1: the arm is back (first of 45 consecutive commands within 8° of rest)
+game2_move1_end,27.5,s,game2_move1: last policy command in the log
+game2_move1_max_jump,6.3,deg,game2_move1: largest per-step command change
+game2_move2_first_leave,1.6,s,game2_move2: first command more than 10° from the rest pose
+game2_move2_start,1.6,s,game2_move2: the arm starts (start of the departure that leads to the farthest point)
+game2_move2_start_far20,3.0,s,game2_move2: first command with shoulder_lift or elbow_flex more than 20° from rest
+game2_move2_back,24.3,s,game2_move2: the arm is back (first of 45 consecutive commands within 8° of rest)
+game2_move2_end,26.3,s,game2_move2: last policy command in the log
+game2_move2_max_jump,4.1,deg,game2_move2: largest per-step command change
+game2_move3_first_leave,3.1,s,game2_move3: first command more than 10° from the rest pose
+game2_move3_start,3.1,s,game2_move3: the arm starts (start of the departure that leads to the farthest point)
+game2_move3_start_far20,4.4,s,game2_move3: first command with shoulder_lift or elbow_flex more than 20° from rest
+game2_move3_end,18.9,s,game2_move3: last policy command in the log
+game2_move3_max_jump,4.5,deg,game2_move3: largest per-step command change
+sync_game_logs,10,logs,logs written by the game script (all sync)
+sync_game_max_jump,6.3,deg,game-script logs: largest per-step command change
+sync_game_jumps_over_6,1,steps,game-script logs: steps with a command change above 6°
+sync_first_inference_min,0.38,s,game-script logs: shortest first observation to first command
+sync_first_inference_max,0.66,s,game-script logs: longest first observation to first command
+game1_move3_end_after_gripper_open,2.3,s,game1_move3: the log ends this long after the gripper was last commanded open
+game2_move3_end_after_gripper_open,2.6,s,game2_move3: the log ends this long after the gripper was last commanded open
+episodes,45,episodes,demonstrations in the clean set
+episode_frames,28707,frames,frames in the clean set
+episode_minutes,15.9,min,total length of the clean set
+episode_duration_min,14.3,s,shortest demonstration
+episode_duration_max,27.1,s,longest demonstration
+episode_duration_median,22.0,s,median demonstration length
+episodes_20261006,24,episodes,demonstrations recorded on 2026-10-06
+episode_duration_median_20261006,22.6,s,"median length, recorded on 2026-10-06"
+episodes_20261010,21,episodes,demonstrations recorded on 2026-10-10
+episode_duration_median_20261010,18.7,s,"median length, recorded on 2026-10-10"
+block1_duration_min,17.9,s,block 1 (middle right): shortest demonstration
+block1_duration_max,25.0,s,block 1 (middle right): longest demonstration
+block2_duration_min,17.7,s,block 2 (bottom left): shortest demonstration
+block2_duration_max,25.8,s,block 2 (bottom left): longest demonstration
+block3_duration_min,18.7,s,block 3 (bottom center): shortest demonstration
+block3_duration_max,26.7,s,block 3 (bottom center): longest demonstration
+block4_duration_min,16.8,s,block 4 (middle center): shortest demonstration
+block4_duration_max,27.1,s,block 4 (middle center): longest demonstration
+block5_duration_min,22.0,s,block 5 (middle left): shortest demonstration
+block5_duration_max,26.7,s,block 5 (middle left): longest demonstration
+block6_duration_min,22.6,s,block 6 (top left): shortest demonstration
+block6_duration_max,26.2,s,block 6 (top left): longest demonstration
+block7_duration_min,14.3,s,block 7 (bottom right): shortest demonstration
+block7_duration_max,18.7,s,block 7 (bottom right): longest demonstration
+block8_duration_min,18.7,s,block 8 (top center): shortest demonstration
+block8_duration_max,24.0,s,block 8 (top center): longest demonstration
+block9_duration_min,15.1,s,block 9 (top right): shortest demonstration
+block9_duration_max,18.9,s,block 9 (top right): longest demonstration
+pause_action_mean,2.4,s,"pause before the first motion, recorded action (leader arm): mean"
+pause_action_median,2.4,s,"pause before the first motion, recorded action (leader arm): median"
+pause_action_min,0.6,s,"pause before the first motion, recorded action (leader arm): shortest"
+pause_action_max,4.6,s,"pause before the first motion, recorded action (leader arm): longest"
+pause_state_mean,2.4,s,"pause before the first motion, measured state (follower arm): mean"
+pause_state_median,2.5,s,"pause before the first motion, measured state (follower arm): median"
+pause_state_min,0.1,s,"pause before the first motion, measured state (follower arm): shortest"
+pause_state_max,4.8,s,"pause before the first motion, measured state (follower arm): longest"
+pause_state_under_half_second,6,episodes,episodes whose follower arm moves more than 3° in the first 0.5 s
+pause_action_under_half_second,0,episodes,episodes whose recorded action moves more than 3° in the first 0.5 s
+pieces_at_start_min,0,pieces,fewest pieces on a start board
+pieces_at_start_max,8,pieces,most pieces on a start board
+pieces_cell_emptiest_max,1,pieces,"the emptiest start board of a cell has at most this many pieces, in every cell"
+pieces_cell_fullest_min,8,pieces,"the fullest start board of a cell has at least this many pieces, in every cell"
+change_threshold,8.0,grey levels,CHANGE_THRESHOLD of scripts/strands_game.py
+unchanged_pairs,10,frame pairs,pairs among five captures of one unchanged scene
+unchanged_cells,90,values,per-cell differences in those pairs
+unchanged_min,1.3,grey levels,unchanged scene: smallest per-cell difference
+unchanged_max,2.2,grey levels,unchanged scene: largest per-cell difference
+unchanged_mean,1.7,grey levels,unchanged scene: mean per-cell difference
+unchanged_jpeg_pairs,3,frame pairs,distinct first-two-frame pairs in the game logs (JPEG)
+unchanged_jpeg_pairs_skipped,7,frame pairs,first-two-frame pairs that are the same frame saved twice
+unchanged_jpeg_max,2.4,grey levels,those JPEG pairs: largest per-cell difference
+game_pairs,4,frame pairs,pairs of first frames of consecutive game moves
+new_piece_cells,8,cells,cells that received a piece between the two frames
+new_piece_min,16.3,grey levels,cell with a new piece: smallest difference
+new_piece_max,22.0,grey levels,cell with a new piece: largest difference
+new_piece_over_threshold,8,cells,cells with a new piece above the threshold
+quiet_cells,20,cells,"cells with no new piece, away from the resting gripper, nothing moved"
+quiet_min,1.8,grey levels,those cells: smallest difference
+quiet_max,5.9,grey levels,those cells: largest difference
+gripper_cells,7,cells,cells with no new piece that the resting gripper partly covers
+gripper_min,5.8,grey levels,those cells: smallest difference
+gripper_max,29.8,grey levels,those cells: largest difference
+gripper_over_threshold,6,cells,those cells above the threshold
+moved_piece_diff,15.2,grey levels,cell whose X was straightened by hand between the frames
+slot_threshold,0.015,share,SLOT_THRESHOLD of scripts/strands_game.py
+slot_x_frames,16,frames,frames with an X in the pick slot
+slot_x_min,0.045,share,X in the slot: smallest red share
+slot_x_max,0.298,share,X in the slot: largest red share
+slot_empty_frames,15,frames,frames with an empty pick slot
+slot_empty_max,0.0,share,empty slot: largest red share
